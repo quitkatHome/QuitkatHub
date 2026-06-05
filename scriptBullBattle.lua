@@ -1,4 +1,4 @@
--- QuitkatHub - Script otimizado com ESP persistente
+-- QuitkatHub - Script open source
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
@@ -92,6 +92,21 @@ local function toggleHighlights(on)
     end
 end
 
+-- Função de teleporte para a arena
+local function teleportarArena()
+    local character = player.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local hrp = character.HumanoidRootPart
+        -- Caminho exato até o objeto
+        local arenaPart = workspace.Map.Map1.EasterDecoInArena["Meshes/mesh_Cylinder.007"]
+        if arenaPart then
+            hrp.CFrame = arenaPart.CFrame + Vector3.new(0, 5, 0) -- sobe 5 studs pra não colidir
+        else
+            warn("Meshes/mesh_Cylinder.007 não encontrado!")
+        end
+    end
+end
+
 -- HUD fixa
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "QuitkatHub"
@@ -166,10 +181,33 @@ showPlayersButton.Font = Enum.Font.SourceSansBold
 showPlayersButton.TextSize = 16
 showPlayersButton.Parent = panel
 
+local tparenaButton = Instance.new("TextButton")
+tparenaButton.Size = UDim2.new(1, -10, 0, 30)
+tparenaButton.Position = UDim2.new(0, 5, 0, 75)
+tparenaButton.Text = "TP Arena (R)"
+tparenaButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+tparenaButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+tparenaButton.Font = Enum.Font.SourceSansBold
+tparenaButton.TextSize = 16
+tparenaButton.Parent = panel
+
 -- Alterna painel
 toggleButton.MouseButton1Click:Connect(function()
     panel.Visible = not panel.Visible
     toggleButton.Text = panel.Visible and "-" or "+"
+end)
+
+-- Conecta botão ao teleporte
+tparenaButton.MouseButton1Click:Connect(function()
+    teleportarArena()
+end)
+
+-- Atalho na tecla R
+local UserInputService = game:GetService("UserInputService")
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.R then
+        teleportarArena()
+    end
 end)
 
 -- Alterna coleta (Autofarm)
